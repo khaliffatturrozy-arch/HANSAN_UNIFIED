@@ -1,5 +1,6 @@
 import { and, eq, sql } from "drizzle-orm";
 import type { AppDb } from "@/db/client";
+import { isPgUniqueViolation } from "@/db/pg-errors";
 import {
   auditLogs,
   orderEvents,
@@ -354,12 +355,6 @@ async function persistOrder(tx: Executor, context: PersistContext): Promise<Sync
   };
 }
 
-function isUniqueViolation(error: unknown): boolean {
-  if (!error || typeof error !== "object") return false;
-  const record = error as { code?: string; message?: string };
-  return record.code === "23505" || Boolean(record.message?.includes("duplicate key"));
-}
-
 function parsePosOccurredAt(value: string): Date {
   // A POS device may be offline for days; accept a bounded window and keep the
   // device time as the business time, never silently replace it with sync time.
@@ -396,7 +391,7 @@ export async function syncPosOrders(
       );
       results.push({ clientOrderId: order.clientOrderId, ok: true, order: synced });
     } catch (error) {
-      if (isUniqueViolation(error)) {
+      if (isPgUniqueViolation(error)) {
         const existing = await findExistingOrder(db, actor.tenantId, order.clientOrderId);
         if (existing) {
           const changeMinor = await readCashChange(db, existing.id);

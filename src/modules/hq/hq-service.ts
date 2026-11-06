@@ -1,6 +1,7 @@
 import { and, desc, eq, gte, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { AppDb } from "@/db/client";
+import { isPgUniqueViolation } from "@/db/pg-errors";
 import {
   auditLogs,
   categories,
@@ -248,7 +249,7 @@ export async function createOutlet(db: AppDb, actor: Actor, input: CreateOutletI
       };
     });
   } catch (error) {
-    if (isUniqueViolation(error)) {
+    if (isPgUniqueViolation(error)) {
       throw new AppError(ERROR_CODES.CONFLICT, "An outlet with this code already exists");
     }
     throw error;
@@ -345,7 +346,7 @@ export async function createProduct(db: AppDb, actor: Actor, input: CreateProduc
       };
     });
   } catch (error) {
-    if (isUniqueViolation(error)) {
+    if (isPgUniqueViolation(error)) {
       throw new AppError(ERROR_CODES.CONFLICT, "A product with this SKU already exists");
     }
     throw error;
@@ -413,15 +414,4 @@ export async function listStaff(db: AppDb, actor: Actor) {
     role: row.role,
     outletCount: isTenantAdmin(row.role as Actor["role"]) ? -1 : (grantCount.get(row.membershipId) ?? 0),
   }));
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  if (!error || typeof error !== "object") return false;
-  const record = error as { code?: string; message?: string; cause?: { code?: string; message?: string } };
-  return (
-    record.code === "23505" ||
-    record.cause?.code === "23505" ||
-    Boolean(record.message?.includes("duplicate key")) ||
-    Boolean(record.cause?.message?.includes("duplicate key"))
-  );
 }

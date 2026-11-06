@@ -39,6 +39,7 @@ As of 7 November 2026:
 | --- | --- |
 | `tests/money.test.ts` | basis-point rounding, discounts, parsing, formatting |
 | `tests/contracts.test.ts` | public table rules, cash-only schema, catalog versioning |
+| `tests/pg-errors.test.ts` | driver error unwrapping through Drizzle causes |
 | `tests/integration-auth-rbac.test.ts` | seed idempotency, login, session hashes, CSRF, revocation, RBAC |
 | `tests/integration-orders.test.ts` | POS sync, idempotency, partial failures, concurrency, rollback, tenant isolation, public orders, KDS |
 | `tests/offline-queue.test.ts` | durable queue, pruning, sync outcomes, retry key stability |
@@ -47,7 +48,7 @@ As of 7 November 2026:
 | `tests/postgres/postgres-validation.test.ts` | real PostgreSQL: lifecycle, migrations, constraints/indexes, transactions, concurrency/locking, POS idempotency, tenant isolation, reconnect persistence, error recovery |
 | `tests/e2e/core.spec.ts` | browser-level operational workflow (Playwright; run separately) |
 
-`npm test`: **7 Vitest files, 59 tests passed**.
+`npm test`: **8 Vitest files, 61 tests passed**.
 `npm run typecheck`: **passed**.
 `npm run test:e2e`: **1 Playwright workflow passed**, including an isolated
 production build.

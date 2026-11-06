@@ -9,6 +9,7 @@ import {
   type PostgresTestDatabase,
 } from "./helpers";
 import { createTenantFixture, makeSyncOrder } from "../helpers/fixtures";
+import { pgErrorCode } from "@/db/pg-errors";
 import { categories, orders, outletOrderCounters, payments, products, tenants } from "@/db/schema";
 import { syncPosOrders } from "@/modules/ordering/order-service";
 import { calculateTotals } from "@/modules/shared/money";
@@ -114,6 +115,16 @@ function orderInput(productId: string, clientOrderId: string) {
   });
 }
 
+/** Drizzle wraps driver errors, so assert on the PostgreSQL code in the cause chain. */
+async function errorCodeOf(promise: Promise<unknown>): Promise<string | undefined> {
+  try {
+    await promise;
+    return undefined;
+  } catch (error) {
+    return pgErrorCode(error);
+  }
+}
+
 describe("PostgreSQL connection and lifecycle", () => {
   it("connects to a real PostgreSQL server with the disposable database", async () => {
     const result = await database.pool.query<{
@@ -139,7 +150,7 @@ describe("PostgreSQL connection and lifecycle", () => {
       const before = await throwaway.pool.query<{ value: number }>("select 1 as value");
       expect(before.rows[0]?.value).toBe(1);
 
-      await throwaway.pool.end();
+      await throwaway.closePool();
       await expect(throwaway.pool.query("select 1")).rejects.toThrow(/after calling end/i);
     } finally {
       await throwaway.close();
@@ -200,20 +211,28 @@ describe("schema constraints", () => {
       .returning();
     expect(tenant).toBeDefined();
 
-    await expect(
-      database.db.insert(tenants).values({ slug, name: "Duplicate slug" }),
-    ).rejects.toMatchObject({ code: "23505" });
+    expect(
+      await errorCodeOf(
+        database.db.insert(tenants).values({ slug, name: "Duplicate slug" }),
+      ),
+    ).toBe("23505");
 
-    await expect(
-      database.db.insert(tenants).values({ slug: uniqueSlug("pg-bad-status"), name: "Bad", status: "bogus" }),
-    ).rejects.toMatchObject({ code: "23514" });
+    expect(
+      await errorCodeOf(
+        database.db
+          .insert(tenants)
+          .values({ slug: uniqueSlug("pg-bad-status"), name: "Bad", status: "bogus" }),
+      ),
+    ).toBe("23514");
 
-    await expect(
-      database.db
-        .update(tenants)
-        .set({ status: "bogus" })
-        .where(eq(tenants.id, tenant!.id)),
-    ).rejects.toMatchObject({ code: "23514" });
+    expect(
+      await errorCodeOf(
+        database.db
+          .update(tenants)
+          .set({ status: "bogus" })
+          .where(eq(tenants.id, tenant!.id)),
+      ),
+    ).toBe("23514");
 
     const [category] = await database.db
       .insert(categories)
@@ -221,27 +240,31 @@ describe("schema constraints", () => {
       .returning();
     expect(category).toBeDefined();
 
-    await expect(
-      database.db.insert(products).values({
-        tenantId: tenant!.id,
-        categoryId: category!.id,
-        sku: "PG-NEGATIVE",
-        name: "Negative price",
-        basePriceMinor: -1,
-        station: "bar",
-      }),
-    ).rejects.toMatchObject({ code: "23514" });
+    expect(
+      await errorCodeOf(
+        database.db.insert(products).values({
+          tenantId: tenant!.id,
+          categoryId: category!.id,
+          sku: "PG-NEGATIVE",
+          name: "Negative price",
+          basePriceMinor: -1,
+          station: "bar",
+        }),
+      ),
+    ).toBe("23514");
 
-    await expect(
-      database.db.insert(products).values({
-        tenantId: tenant!.id,
-        categoryId: category!.id,
-        sku: "PG-BAD-STATION",
-        name: "Bad station",
-        basePriceMinor: 1_000,
-        station: "grill",
-      }),
-    ).rejects.toMatchObject({ code: "23514" });
+    expect(
+      await errorCodeOf(
+        database.db.insert(products).values({
+          tenantId: tenant!.id,
+          categoryId: category!.id,
+          sku: "PG-BAD-STATION",
+          name: "Bad station",
+          basePriceMinor: 1_000,
+          station: "grill",
+        }),
+      ),
+    ).toBe("23514");
   });
 });
 
@@ -596,9 +619,9 @@ describe("persistence across application restart", () => {
 
 describe("database errors and recovery", () => {
   it("surfaces SQL errors and keeps the pool usable", async () => {
-    await expect(
-      database.pool.query("select * from table_that_does_not_exist"),
-    ).rejects.toMatchObject({ code: "42P01" });
+    expect(
+      await errorCodeOf(database.pool.query("select * from table_that_does_not_exist")),
+    ).toBe("42P01");
 
     const after = await database.pool.query<{ value: number }>("select 1 as value");
     expect(after.rows[0]?.value).toBe(1);
