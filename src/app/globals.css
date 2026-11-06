@@ -1,0 +1,614 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   HANSAN design tokens
+   Primitive -> semantic -> component. No gradients are used anywhere.
+   --------------------------------------------------------------------------- */
+
+:root {
+  --hansan-ink: #1c1a15;
+  --hansan-ink-soft: #3a362e;
+  --hansan-ivory: #fff5d5;
+  --hansan-paper: #f4ecda;
+  --hansan-white: #ffffff;
+  --hansan-orange: #ff7a00;
+  --hansan-orange-deep: #d95f00;
+  --hansan-blue: #0029ff;
+  --hansan-blue-wash: #e7eaff;
+  --hansan-green: #0b6b3a;
+  --hansan-green-wash: #dff3e7;
+  --hansan-red: #b42318;
+  --hansan-red-wash: #ffe4e1;
+  --hansan-muted: #6e675a;
+  --hansan-line: #1c1a15;
+  --hansan-line-soft: rgba(28, 26, 21, 0.2);
+  --hansan-radius: 4px;
+  --hansan-radius-sm: 4px;
+  --hansan-shadow: 0 12px 32px rgba(28, 26, 21, 0.14);
+  --hansan-shadow-sm: none;
+
+  /* Semantic aliases */
+  --surface-page: var(--hansan-ivory);
+  --surface-card: var(--hansan-white);
+  --text-primary: var(--hansan-ink);
+  --text-muted: var(--hansan-muted);
+  --border-strong: var(--hansan-ink);
+  --accent-primary: var(--hansan-orange);
+  --accent-info: var(--hansan-blue);
+  --status-online: var(--hansan-green);
+  --status-offline: var(--hansan-orange-deep);
+  --status-danger: var(--hansan-red);
+
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-ink: var(--hansan-ink);
+  --color-ink-soft: var(--hansan-ink-soft);
+  --color-ivory: var(--hansan-ivory);
+  --color-paper: var(--hansan-paper);
+  --color-brand-orange: var(--hansan-orange);
+  --color-brand-blue: var(--hansan-blue);
+  --color-orange: var(--hansan-orange);
+  --color-blue: var(--hansan-blue);
+  --color-brand-green: var(--hansan-green);
+  --color-brand-red: var(--hansan-red);
+  --color-muted: var(--hansan-muted);
+  --font-sans: "Glacial Indifference", "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Glacial Indifference", "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+  --radius-card: 4px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--surface-page);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: "Glacial Indifference", "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--hansan-blue);
+  color: #ffffff;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 3px solid var(--hansan-blue);
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+p {
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Typography
+   --------------------------------------------------------------------------- */
+
+.h-display {
+  font-family: "Glacial Indifference", "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 750;
+  letter-spacing: -0.055em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.h-title {
+  font-family: "Glacial Indifference", "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 750;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.h-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.h-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.h-num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+.h-mono {
+  font-family: ui-monospace, "Cascadia Mono", "Segoe UI Mono", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.h-muted {
+  color: var(--text-muted);
+}
+
+/* ---------------------------------------------------------------------------
+   Surfaces
+   --------------------------------------------------------------------------- */
+
+.h-card {
+  background: var(--surface-card);
+  border: 1px solid var(--hansan-line-soft);
+  border-radius: var(--hansan-radius);
+}
+
+.h-card-pad {
+  padding: 18px;
+}
+
+.h-card-lift {
+  box-shadow: var(--hansan-shadow);
+}
+
+.h-panel-blue {
+  background: var(--hansan-white);
+  color: var(--hansan-ink);
+  border: 1px solid var(--hansan-line-soft);
+  border-radius: var(--hansan-radius);
+}
+
+.h-panel-orange {
+  background: var(--hansan-white);
+  color: var(--hansan-ink);
+  border: 1px solid var(--hansan-line-soft);
+  border-radius: var(--hansan-radius);
+}
+
+.h-panel-ink {
+  background: var(--hansan-ink);
+  color: var(--hansan-ivory);
+  border: 1px solid var(--hansan-ink);
+  border-radius: var(--hansan-radius);
+}
+
+.h-rule {
+  border: 0;
+  border-top: 2px solid var(--hansan-ink);
+  margin: 0;
+}
+
+.h-dashed-rule {
+  border: 0;
+  border-top: 2px dashed rgba(18, 18, 18, 0.35);
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Buttons
+   --------------------------------------------------------------------------- */
+
+.h-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 9px 16px;
+  border: 1px solid var(--hansan-line-soft);
+  border-radius: var(--hansan-radius);
+  background: var(--hansan-paper);
+  color: var(--hansan-ink);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.h-btn:hover:not(:disabled) {
+  border-color: var(--hansan-ink);
+  background-color: var(--hansan-paper);
+}
+
+.h-btn:active:not(:disabled) {
+  background-color: var(--hansan-ivory);
+}
+
+.h-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.h-btn-primary {
+  background: var(--hansan-orange);
+  color: var(--hansan-ink);
+}
+
+.h-btn-blue {
+  background: var(--hansan-blue);
+  color: #ffffff;
+}
+
+.h-btn-ink {
+  background: var(--hansan-ink);
+  color: var(--hansan-ivory);
+}
+
+.h-btn-danger {
+  background: var(--hansan-red-wash);
+  color: var(--hansan-red);
+  border-color: var(--hansan-red);
+}
+
+.h-btn-sm {
+  min-height: 36px;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: var(--hansan-radius);
+}
+
+.h-btn-sm:hover:not(:disabled) {
+  background: var(--hansan-paper);
+}
+
+.h-btn-ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.h-btn-ghost:hover:not(:disabled) {
+  background: rgba(28, 26, 21, 0.06);
+}
+
+/* ---------------------------------------------------------------------------
+   Forms
+   --------------------------------------------------------------------------- */
+
+.h-field {
+  display: grid;
+  gap: 6px;
+}
+
+.h-input,
+.h-select,
+.h-textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 1px solid var(--hansan-line-soft);
+  border-radius: var(--hansan-radius-sm);
+  background: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.h-input::placeholder,
+.h-textarea::placeholder {
+  color: #948c7c;
+  font-weight: 500;
+}
+
+.h-input:focus,
+.h-select:focus,
+.h-textarea:focus {
+  border-color: var(--hansan-blue);
+  outline: 2px solid var(--hansan-blue);
+  outline-offset: 2px;
+}
+
+.h-textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.h-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.h-error {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--hansan-red);
+  border-radius: var(--hansan-radius-sm);
+  background: var(--hansan-red-wash);
+  color: var(--hansan-red);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.h-success {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--hansan-green);
+  border-radius: var(--hansan-radius-sm);
+  background: var(--hansan-green-wash);
+  color: var(--hansan-green);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------------------
+   Badges and chips
+   --------------------------------------------------------------------------- */
+
+.h-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 3px 9px;
+  border: 1px solid var(--hansan-line-soft);
+  border-radius: 999px;
+  background: var(--hansan-paper);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.h-badge-orange {
+  background: var(--hansan-orange);
+}
+
+.h-badge-blue {
+  background: var(--hansan-blue);
+  color: #ffffff;
+}
+
+.h-badge-green {
+  background: var(--hansan-green-wash);
+  border-color: var(--hansan-green);
+  color: var(--hansan-green);
+}
+
+.h-badge-red {
+  background: var(--hansan-red-wash);
+  border-color: var(--hansan-red);
+  color: var(--hansan-red);
+}
+
+.h-badge-ink {
+  background: var(--hansan-ink);
+  color: var(--hansan-ivory);
+  border-color: var(--hansan-ink);
+}
+
+.h-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 5px 12px;
+  border: 1px solid var(--hansan-line-soft);
+  border-radius: var(--hansan-radius);
+  background: var(--hansan-paper);
+  font-size: 12px;
+  font-weight: 800;
+  transition: background-color 120ms ease;
+}
+
+.h-chip[data-active="true"] {
+  background: var(--hansan-ink);
+  color: var(--hansan-ivory);
+}
+
+.h-dot {
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--hansan-ink);
+  border-radius: 999px;
+  background: var(--hansan-green);
+  flex: none;
+}
+
+.h-dot[data-state="offline"] {
+  background: var(--hansan-orange);
+}
+
+.h-dot[data-state="error"] {
+  background: var(--hansan-red);
+}
+
+/* ---------------------------------------------------------------------------
+   Tables
+   --------------------------------------------------------------------------- */
+
+.h-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.h-table th {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--hansan-ink);
+  text-align: left;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.h-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--hansan-line-soft);
+  vertical-align: middle;
+}
+
+.h-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.h-table tbody tr:hover {
+  background: rgba(28, 26, 21, 0.025);
+}
+
+/* ---------------------------------------------------------------------------
+   Scrollbars
+   --------------------------------------------------------------------------- */
+
+.h-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--hansan-ink) transparent;
+}
+
+.h-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.h-scroll::-webkit-scrollbar-thumb {
+  background: var(--hansan-ink);
+  border: 3px solid var(--surface-page);
+  border-radius: 999px;
+}
+
+.h-stat {
+  min-width: 0;
+  padding: 14px 16px;
+}
+
+@media (max-width: 639px) {
+  .h-stat:nth-child(odd) {
+    border-right: 1px solid var(--hansan-line-soft);
+  }
+
+  .h-stat:nth-child(n + 3) {
+    border-top: 1px solid var(--hansan-line-soft);
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1279px) {
+  .h-stat:not(:nth-child(3n + 1)) {
+    border-left: 1px solid var(--hansan-line-soft);
+  }
+
+  .h-stat:nth-child(n + 4) {
+    border-top: 1px solid var(--hansan-line-soft);
+  }
+}
+
+@media (min-width: 1280px) {
+  .h-stat:not(:first-child) {
+    border-left: 1px solid var(--hansan-line-soft);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Motion
+   --------------------------------------------------------------------------- */
+
+@keyframes h-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes h-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.h-rise {
+  animation: h-rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.h-pulse {
+  animation: h-pulse 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Print (receipts)
+   --------------------------------------------------------------------------- */
+
+@media print {
+  .h-no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Small-screen helpers
+   --------------------------------------------------------------------------- */
+
+.h-safe-bottom {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+@media (max-width: 767px) {
+  .h-card-pad {
+    padding: 14px;
+  }
+}

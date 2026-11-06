@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#FF7A00" />
+    <title>Offline · HANSAN</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #121212;
+        --paper: #fffdf8;
+        --ivory: #fff5d5;
+        --orange: #ff7a00;
+        --blue: #0029ff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: var(--ivory);
+        color: var(--ink);
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      main {
+        width: min(560px, 100%);
+        border: 2px solid var(--ink);
+        border-radius: 14px;
+        background: var(--paper);
+        box-shadow: 6px 6px 0 var(--ink);
+        overflow: hidden;
+      }
+      .bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 18px;
+        border-bottom: 2px solid var(--ink);
+        background: var(--orange);
+      }
+      .wordmark {
+        font-size: 18px;
+        font-weight: 900;
+        letter-spacing: 0.16em;
+      }
+      .status {
+        border: 2px solid var(--ink);
+        border-radius: 999px;
+        background: var(--paper);
+        padding: 3px 9px;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .body { padding: 28px 22px 24px; }
+      .eyebrow {
+        margin: 0 0 8px;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #57534e;
+      }
+      h1 {
+        margin: 0;
+        max-width: 14ch;
+        font-size: clamp(36px, 9vw, 54px);
+        line-height: 0.98;
+        letter-spacing: -0.05em;
+      }
+      p {
+        margin: 16px 0 0;
+        max-width: 42ch;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.6;
+        color: #57534e;
+      }
+      .note {
+        margin-top: 20px;
+        border: 2px solid var(--ink);
+        border-left: 8px solid var(--blue);
+        border-radius: 10px;
+        background: var(--ivory);
+        padding: 12px 14px;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.55;
+      }
+      button {
+        margin-top: 20px;
+        width: 100%;
+        min-height: 48px;
+        border: 2px solid var(--ink);
+        border-radius: 10px;
+        background: var(--orange);
+        color: var(--ink);
+        font: inherit;
+        font-weight: 900;
+        cursor: pointer;
+      }
+      button:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="bar">
+        <span class="wordmark">HANSAN</span>
+        <span class="status">Offline</span>
+      </header>
+      <div class="body">
+        <p class="eyebrow">Network unavailable</p>
+        <h1>No connection.</h1>
+        <p>
+          This page has not been cached on this device yet. Reconnect once to load the terminal.
+          Saved cash sales remain in the terminal's local queue and are not lost.
+        </p>
+        <div class="note">
+          Do not clear browser storage while sales are waiting to sync. Reopen the installed app
+          when the connection returns.
+        </div>
+        <button type="button" onclick="location.reload()">Try again</button>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+build/
+.next-stale-*/
+
+# Local database and runtime data
+.data/
+*.pglite/
+
+# Test and coverage artifacts
+coverage/
+test-results/
+playwright-report/
+blob-report/
+*.lcov
+
+# TypeScript and build caches
+*.tsbuildinfo
+next-env.d.ts
+
+# Local scratch and validation scripts
+.tmp-*
+tmp/
+temp/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Secrets and credentials
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+credentials*
+service-account*
+secrets*
+.ssh/
+.aws/
+
+# Deployment tooling
+.vercel/
+.netlify/
