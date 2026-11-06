@@ -5,6 +5,7 @@
 ```bash
 npm run typecheck
 npm test
+npm run test:postgres
 npm run test:e2e
 ```
 
@@ -43,6 +44,7 @@ As of 7 November 2026:
 | `tests/offline-queue.test.ts` | durable queue, pruning, sync outcomes, retry key stability |
 | `tests/db-bootstrap.test.ts` | PGlite atomic lock contention, lock ownership/release, persistent cross-process reopening |
 | `tests/db-lifecycle.test.ts` | constructor/readiness/migration/shutdown cleanup and handle lifecycle |
+| `tests/postgres/postgres-validation.test.ts` | real PostgreSQL: lifecycle, migrations, constraints/indexes, transactions, concurrency/locking, POS idempotency, tenant isolation, reconnect persistence, error recovery |
 | `tests/e2e/core.spec.ts` | browser-level operational workflow (Playwright; run separately) |
 
 `npm test`: **7 Vitest files, 59 tests passed**.
@@ -89,11 +91,46 @@ The Playwright workflow verifies:
   remove a replacement owner's lock; a later process can reopen a persistent
   database after clean shutdown.
 
+## Real PostgreSQL validation
+
+`npm test` uses PGlite and remains the fast in-process suite. It is not a
+substitute for PostgreSQL validation.
+
+`npm run test:postgres` requires `HANSAN_TEST_POSTGRES_URL`, which must point at
+a disposable PostgreSQL server. The suite creates a uniquely named database for
+each run, applies the real Drizzle migration, exercises the production
+node-postgres code path, and drops every database it created. It never connects
+to `.data/pglite` or an application database.
+
+The GitHub Actions `PostgreSQL validation` job runs this suite against a
+`postgres:17` service container. Locally, any reachable PostgreSQL 13+ server can
+be used, for example:
+
+```bash
+HANSAN_TEST_POSTGRES_URL=postgresql://postgres:postgres@localhost:5432/postgres npm run test:postgres
+```
+
+The suite covers:
+
+- Connection, `current_database()`, server address, and pool shutdown.
+- Migration application, idempotent re-run, all 17 tables, documented indexes,
+  and check constraints.
+- Check/unique violations with automatic recovery.
+- Transaction commit and rollback.
+- Concurrent distinct orders receiving unique order numbers.
+- Row-level locking on the outlet order counter.
+- Concurrent and sequential replay of one client order id.
+- Cross-outlet replay rejection and cross-tenant isolation.
+- Committed data surviving an application/connection-pool restart.
+- SQL errors and recovery after server-side connection termination.
+
+A full PostgreSQL server-process restart is not automated; the reconnect test
+covers application and connection-pool restarts against the same server.
+
 ## Not validated by this suite
 
-- Real PostgreSQL networking, migration behavior, constraints, failover, or
-  concurrency. PostgreSQL and Docker were unavailable in this environment;
-  PGlite results do not substitute for PostgreSQL validation.
+- PostgreSQL server-process restart, failover, replication, backup/restore, and
+  production network topology. The CI job uses one disposable container.
 - Service-worker cache behavior under browser storage pressure, accessibility,
   visual regression, load/soak, and penetration testing.
 - Payment-provider integration (not implemented).

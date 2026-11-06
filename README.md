@@ -81,7 +81,8 @@ accounts; the demo seed refuses to run in production.
 ```bash
 npm run dev          # development server
 npm run typecheck    # TypeScript, including tests
-npm test             # Vitest suite
+npm test             # Vitest suite (PGlite)
+npm run test:postgres # real PostgreSQL validation (requires HANSAN_TEST_POSTGRES_URL)
 npm run build        # production build
 npm start            # serve the production build
 npm run db:generate  # generate a migration after schema edits
