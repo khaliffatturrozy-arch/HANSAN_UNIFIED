@@ -105,9 +105,10 @@ to `.data/pglite` or an application database.
 
 The GitHub Actions `PostgreSQL validation` job runs this suite against a
 `postgres:17` service container. CI run `42302296209` passed all 17 PostgreSQL
-tests on 7 November 2026. That run also exposed and fixed a driver-wrapping
-defect in idempotent POS replay (`src/db/pg-errors.ts`). Locally, any reachable
-PostgreSQL 13+ server can be used, for example:
+tests on 7 November 2026; that run also exposed and fixed a driver-wrapping
+defect in idempotent POS replay (`src/db/pg-errors.ts`). CI run `42304505657`
+then restarted the server container and verified a committed row survived.
+Locally, any reachable PostgreSQL 13+ server can be used, for example:
 
 ```bash
 HANSAN_TEST_POSTGRES_URL=postgresql://postgres:postgres@localhost:5432/postgres npm run test:postgres

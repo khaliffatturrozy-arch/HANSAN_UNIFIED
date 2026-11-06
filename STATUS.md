@@ -34,21 +34,24 @@ is not a PGlite result. The suite creates uniquely named databases, applies the
 real Drizzle migration through node-postgres, and drops every database it
 creates.
 
-- CI run: `https://github.com/khaliffatturrozy-arch/HANSAN_UNIFIED/actions/runs/42302296209`
-- Commit: `abb0629c4b5f65b2008c907068b0e358e0baa6cb`
-- Result: the `PostgreSQL validation` job and all other CI jobs passed.
+- CI run `42302296209` (commit `abb0629`): the 17-test PostgreSQL suite and all
+  other jobs passed.
+- CI run `42304505657` (commit `c9b8fa3`): the suite passed again, then a
+  disposable database was prepared, the `postgres:17` server container was
+  restarted with Docker, and the committed tenant row was verified after the
+  restart before the database was dropped. All jobs passed.
 - Covered: connection/lifecycle, migration idempotency, the 17-table schema,
   indexes and check constraints, transaction commit/rollback, concurrent
   order-number allocation, row-level locking, sequential and concurrent POS
   replay idempotency, cross-outlet replay rejection, tenant isolation, reconnect
-  persistence, SQL error recovery, and recovery after server-side connection
-  termination.
+  persistence, SQL error recovery, recovery after server-side connection
+  termination, and persistence across a real PostgreSQL server restart.
 - The run exposed and fixed a cross-driver defect: Drizzle wraps node-postgres
   errors, so `order-service` had not detected PostgreSQL unique violations during
   concurrent replay. `src/db/pg-errors.ts` now unwraps the cause chain.
 - `npm test` on the workstation after the fix: 8 files, 61 tests passed.
-- Not covered: PostgreSQL server-process restart, failover, replication,
-  backup/restore, Compose startup, or production ingress.
+- Not covered: PostgreSQL failover, replication, backup/restore, Compose startup,
+  or production ingress.
 
 ## Database runtime verification (5 November 2026)
 
@@ -294,8 +297,8 @@ modules or claiming production readiness.
 
 ## Next priorities
 
-1. Run the Compose topology end to end and validate production ingress,
-   backup/restore, and a PostgreSQL server-process restart.
+1. Run the Compose topology end to end and validate production ingress and
+   backup/restore.
 2. Add nonce-based CSP and move rate limits to shared storage.
 3. Add online payment, refunds, and receipt printing only with provider-level
    idempotency and reconciliation.
