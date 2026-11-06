@@ -83,6 +83,32 @@ jobs:
         env:
           HANSAN_TEST_POSTGRES_URL: postgresql://postgres:postgres@localhost:5432/postgres
 
+      - name: Prepare restart persistence probe
+        run: node scripts/postgres-restart-check.mjs prepare
+        env:
+          HANSAN_TEST_POSTGRES_URL: postgresql://postgres:postgres@localhost:5432/postgres
+          HANSAN_RESTART_STATE_FILE: ${{ runner.temp }}/hansan-pg-restart.json
+
+      - name: Restart the PostgreSQL server container
+        run: |
+          container_id="$(docker ps -q --filter ancestor=postgres:17)"
+          test -n "$container_id"
+          docker restart "$container_id"
+          for attempt in $(seq 1 30); do
+            if docker exec "$container_id" pg_isready -U postgres; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "PostgreSQL did not become ready after restart" >&2
+          exit 1
+
+      - name: Verify persistence after server restart
+        run: node scripts/postgres-restart-check.mjs verify
+        env:
+          HANSAN_TEST_POSTGRES_URL: postgresql://postgres:postgres@localhost:5432/postgres
+          HANSAN_RESTART_STATE_FILE: ${{ runner.temp }}/hansan-pg-restart.json
+
   e2e:
     name: Playwright E2E
     runs-on: ubuntu-latest

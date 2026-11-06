@@ -125,15 +125,19 @@ The suite covers:
 - Concurrent and sequential replay of one client order id.
 - Cross-outlet replay rejection and cross-tenant isolation.
 - Committed data surviving an application/connection-pool restart.
+- A committed row surviving a real `postgres:17` server-process restart: CI
+  prepares a disposable database, restarts the server container, and verifies
+  the row before dropping the database.
 - SQL errors and recovery after server-side connection termination.
 
-A full PostgreSQL server-process restart is not automated; the reconnect test
-covers application and connection-pool restarts against the same server.
+The CI job performs the server restart with Docker because GitHub Actions service
+containers cannot be restarted through the workflow service API. The probe uses
+synthetic data in its own disposable database.
 
 ## Not validated by this suite
 
-- PostgreSQL server-process restart, failover, replication, backup/restore, and
-  production network topology. The CI job uses one disposable container.
+- PostgreSQL failover, replication, backup/restore, and production network
+  topology. The CI job uses one disposable container.
 - Service-worker cache behavior under browser storage pressure, accessibility,
   visual regression, load/soak, and penetration testing.
 - Payment-provider integration (not implemented).
