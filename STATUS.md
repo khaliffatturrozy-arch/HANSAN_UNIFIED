@@ -21,10 +21,34 @@
 Validation on 7 November 2026:
 
 - `npm run typecheck`: passed.
-- `npm test`: 7 files, 59 tests passed.
+- `npm test`: 8 files, 61 tests passed.
 - `npm run build`: passed.
 - `npm run test:e2e`: 1 browser workflow passed.
 - `npm audit --omit=dev`: 0 vulnerabilities.
+
+## Real PostgreSQL validation (7 November 2026)
+
+Local PostgreSQL and Docker remain unavailable on this workstation. Validation
+ran in GitHub Actions against a disposable `postgres:17` service container; it
+is not a PGlite result. The suite creates uniquely named databases, applies the
+real Drizzle migration through node-postgres, and drops every database it
+creates.
+
+- CI run: `https://github.com/khaliffatturrozy-arch/HANSAN_UNIFIED/actions/runs/42302296209`
+- Commit: `abb0629c4b5f65b2008c907068b0e358e0baa6cb`
+- Result: the `PostgreSQL validation` job and all other CI jobs passed.
+- Covered: connection/lifecycle, migration idempotency, the 17-table schema,
+  indexes and check constraints, transaction commit/rollback, concurrent
+  order-number allocation, row-level locking, sequential and concurrent POS
+  replay idempotency, cross-outlet replay rejection, tenant isolation, reconnect
+  persistence, SQL error recovery, and recovery after server-side connection
+  termination.
+- The run exposed and fixed a cross-driver defect: Drizzle wraps node-postgres
+  errors, so `order-service` had not detected PostgreSQL unique violations during
+  concurrent replay. `src/db/pg-errors.ts` now unwraps the cause chain.
+- `npm test` on the workstation after the fix: 8 files, 61 tests passed.
+- Not covered: PostgreSQL server-process restart, failover, replication,
+  backup/restore, Compose startup, or production ingress.
 
 ## Database runtime verification (5 November 2026)
 
@@ -56,7 +80,7 @@ Validation on 7 November 2026:
 
 | Check | Result |
 | --- | --- |
-| `npm test` | 7 files, 59 tests passed |
+| `npm test` | 8 files, 61 tests passed |
 | `npm run typecheck` | Passed |
 | `npm run test:e2e` | 1 Playwright workflow passed; isolated production build and test server |
 | E2E cleanup | 0 `hansan-e2e-*` temporary directories remained after the final run |
@@ -65,7 +89,7 @@ Validation on 7 November 2026:
 | Existing `.data/pglite` database | Not inspected or modified |
 | `npm audit --omit=dev` | 0 vulnerabilities |
 | Full `npm audit` | 4 moderate findings in nested development-tooling `esbuild`; no forced dependency downgrade applied |
-| PostgreSQL / Docker | Not available; PostgreSQL integration and Compose validation not run |
+| PostgreSQL / Docker | PostgreSQL 17 validated in CI on 7 November 2026; Docker Compose startup still not run |
 | V1/V3 comparison | Not possible (source repositories absent) |
 
 Only the checks marked passed should be treated as evidence.
@@ -135,7 +159,7 @@ offline reload restored the terminal as expected.
   database, build output, or port-3000 server. The parent runner removes its
   exact per-run temporary directory after Playwright exits; the final run left
   zero matching temporary directories.
-- `npm test`: **7 files, 59 tests passed**.
+- `npm test`: **8 files, 61 tests passed**.
 - `npm run typecheck`: **passed**.
 - `npm run test:e2e`: **1 Playwright workflow passed**, including isolated
   `next build --webpack` and browser verification; temporary-directory cleanup
@@ -156,12 +180,17 @@ Existing tests cover constructor, readiness, migration, and shutdown failures.
 An uncertain/stale lock is not automatically deleted. These application tests
 do not establish PostgreSQL multi-process behavior.
 
-### PostgreSQL validation blocker
+### PostgreSQL validation status (updated 7 November 2026)
 
-`psql`, `pg_ctl`, `docker`, and `docker-compose` were unavailable, and
-localhost:5432 did not accept a connection. PostgreSQL migrations, constraints,
-and integration behavior were **not validated**. PGlite results are not a
-substitute for this missing PostgreSQL run.
+At the time of the 5 November gate, `psql`, `pg_ctl`, `docker`, and
+`docker-compose` were unavailable, and localhost:5432 did not accept a
+connection. PostgreSQL behavior was not validated locally then.
+
+On 7 November 2026 the dedicated suite passed against a real `postgres:17`
+server in GitHub Actions, covering migrations, constraints, transactions,
+concurrency, locking, POS idempotency, tenant isolation, reconnect persistence,
+and error recovery. See the validation section at the top of this file. PGlite
+results remain supplementary and are not treated as PostgreSQL evidence.
 
 ### Security and administration assessment
 
@@ -182,11 +211,11 @@ substitute for this missing PostgreSQL run.
 
 ### Gate decision: NO-GO for expanding business modules
 
-The isolated app logic, PGlite lifecycle, and browser workflows pass, but
-PostgreSQL and deployment ingress are unvalidated, staff provisioning is
-incomplete, and the identified operational/security hardening remains. Resolve
-the PostgreSQL validation blocker and production deployment controls before
-expanding the next business modules or claiming production readiness.
+The isolated app logic, PGlite lifecycle, and browser workflows pass. PostgreSQL
+is now validated in CI; deployment ingress remains unvalidated, staff
+provisioning is incomplete, and the identified operational/security hardening
+remains. Resolve the deployment controls before expanding the next business
+modules or claiming production readiness.
 
 ## Working surfaces
 
@@ -255,19 +284,20 @@ expanding the next business modules or claiming production readiness.
 ## Verification constraints
 
 - **No local PostgreSQL or Docker:** production database networking, backup, and
-  Compose startup are authored but unvalidated here. PGlite integration tests use
-  the real schema and migrations but cannot prove production topology behavior.
+  Compose startup are authored but unvalidated locally. The CI suite now
+  validates migrations, constraints, concurrency, and recovery against
+  PostgreSQL 17; PGlite integration tests remain supplementary.
 - **V1 and V3 source absent:** no parity claim, migration, or comparative audit is
   made. Existing V1/V3 audit documents in the workspace were treated as stale.
-- **No Git operations:** no commits, pushes, or deployments have been performed.
+- **Git:** the baseline and PostgreSQL validation batches are published on
+  `main`; no deployment has been performed.
 
 ## Next priorities
 
-1. Add an automated browser E2E suite for the verified operational flows.
-2. Run the Compose topology and migrations against PostgreSQL in a staging
-   environment; capture evidence.
-3. Add nonce-based CSP and move rate limits to shared storage.
-4. Add online payment, refunds, and receipt printing only with provider-level
+1. Run the Compose topology end to end and validate production ingress,
+   backup/restore, and a PostgreSQL server-process restart.
+2. Add nonce-based CSP and move rate limits to shared storage.
+3. Add online payment, refunds, and receipt printing only with provider-level
    idempotency and reconciliation.
-5. Add staff provisioning and per-outlet public storefront routing.
-6. Add load/security tests.
+4. Add staff provisioning and per-outlet public storefront routing.
+5. Add load/security tests.
